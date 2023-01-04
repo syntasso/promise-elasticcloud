@@ -1,5 +1,7 @@
 # Elasitc Cloud on Kubernetes
 
+[![syntasso](https://circleci.com/gh/syntasso/promise-elasticcloud.svg?style=shield)](https://app.circleci.com/pipelines/github/syntasso/promise-elasticcloud?branch=main)
+
 This Promise deploys an Elasticsearch and a Kibana instance, using [Elastic Cloud on
 Kubernetes
 (ECK)](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-overview.html). The
