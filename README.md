@@ -1,4 +1,4 @@
-# Elasitc Cloud on Kubernetes
+# Elastic Cloud on Kubernetes
 
 [![syntasso](https://circleci.com/gh/syntasso/promise-elasticcloud.svg?style=shield)](https://app.circleci.com/pipelines/github/syntasso/promise-elasticcloud?branch=main)
 
