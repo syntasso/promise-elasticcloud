@@ -5,7 +5,37 @@ metadata:
   name: elasticcloud
   namespace: default
 spec:
-  workerClusterResources:
+  api:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: elasticclouds.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: elasticcloud
+        plural: elasticclouds
+        singular: elasticcloud
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  env:
+                    default: dev
+                    description: |
+                      Deploy Elastic Cloud for Kubernetes to specific environment.
+                      Production includes autoscaling for both Elastic and Kibana.
+                    pattern: ^(dev|prod)$
+                    type: string
+                type: object
+            type: object
+        served: true
+        storage: true
+  dependencies:
   - apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
@@ -17,6 +47,7 @@ spec:
         app.kubernetes.io/name: eck-operator-crds
         app.kubernetes.io/version: 2.5.0
       name: agents.agent.k8s.elastic.co
+      namespace: default
     spec:
       group: agent.k8s.elastic.co
       names:
@@ -914,6 +945,7 @@ spec:
         app.kubernetes.io/name: eck-operator-crds
         app.kubernetes.io/version: 2.5.0
       name: apmservers.apm.k8s.elastic.co
+      namespace: default
     spec:
       group: apm.k8s.elastic.co
       names:
@@ -2199,6 +2231,7 @@ spec:
         app.kubernetes.io/name: eck-operator-crds
         app.kubernetes.io/version: 2.5.0
       name: beats.beat.k8s.elastic.co
+      namespace: default
     spec:
       group: beat.k8s.elastic.co
       names:
@@ -2719,6 +2752,7 @@ spec:
         app.kubernetes.io/name: eck-operator-crds
         app.kubernetes.io/version: 2.5.0
       name: elasticmapsservers.maps.k8s.elastic.co
+      namespace: default
     spec:
       group: maps.k8s.elastic.co
       names:
@@ -3349,6 +3383,7 @@ spec:
         app.kubernetes.io/name: eck-operator-crds
         app.kubernetes.io/version: 2.5.0
       name: elasticsearchautoscalers.autoscaling.k8s.elastic.co
+      namespace: default
     spec:
       group: autoscaling.k8s.elastic.co
       names:
@@ -3704,6 +3739,7 @@ spec:
         app.kubernetes.io/name: eck-operator-crds
         app.kubernetes.io/version: 2.5.0
       name: elasticsearches.elasticsearch.k8s.elastic.co
+      namespace: default
     spec:
       group: elasticsearch.k8s.elastic.co
       names:
@@ -6659,6 +6695,7 @@ spec:
         app.kubernetes.io/name: eck-operator-crds
         app.kubernetes.io/version: 2.5.0
       name: enterprisesearches.enterprisesearch.k8s.elastic.co
+      namespace: default
     spec:
       group: enterprisesearch.k8s.elastic.co
       names:
@@ -7877,6 +7914,7 @@ spec:
         app.kubernetes.io/name: eck-operator-crds
         app.kubernetes.io/version: 2.5.0
       name: kibanas.kibana.k8s.elastic.co
+      namespace: default
     spec:
       group: kibana.k8s.elastic.co
       names:
@@ -9306,6 +9344,7 @@ spec:
         app.kubernetes.io/version: 2.5.0
         control-plane: elastic-operator
       name: elastic-operator
+      namespace: default
     rules:
     - apiGroups:
       - authorization.k8s.io
@@ -9522,6 +9561,7 @@ spec:
         rbac.authorization.k8s.io/aggregate-to-edit: "true"
         rbac.authorization.k8s.io/aggregate-to-view: "true"
       name: elastic-operator-view
+      namespace: default
     rules:
     - apiGroups:
       - elasticsearch.k8s.elastic.co
@@ -9596,6 +9636,7 @@ spec:
         rbac.authorization.k8s.io/aggregate-to-admin: "true"
         rbac.authorization.k8s.io/aggregate-to-edit: "true"
       name: elastic-operator-edit
+      namespace: default
     rules:
     - apiGroups:
       - elasticsearch.k8s.elastic.co
@@ -9684,6 +9725,7 @@ spec:
         app.kubernetes.io/version: 2.5.0
         control-plane: elastic-operator
       name: elastic-operator
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9784,6 +9826,7 @@ spec:
         app.kubernetes.io/version: 2.5.0
         control-plane: elastic-operator
       name: elastic-webhook.k8s.elastic.co
+      namespace: default
     webhooks:
     - admissionReviewVersions:
       - v1beta1
@@ -10027,36 +10070,16 @@ spec:
         resources:
         - elasticsearchautoscalers
       sideEffects: None
-  xaasCrd:
-    apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    metadata:
-      name: elasticclouds.marketplace.kratix.io
-    spec:
-      group: marketplace.kratix.io
-      names:
-        kind: elasticcloud
-        plural: elasticclouds
-        singular: elasticcloud
-      scope: Namespaced
-      versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  env:
-                    default: dev
-                    description: |
-                      Deploy Elastic Cloud for Kubernetes to specific environment.
-                      Production includes autoscaling for both Elastic and Kibana.
-                    pattern: ^(dev|prod)$
-                    type: string
-                type: object
-            type: object
-        served: true
-        storage: true
-  xaasRequestPipeline:
-  - ghcr.io/syntasso/promise-elasticcloud/elasticcloud-request-pipeline:v0.1.0
+  workflows:
+    resource:
+      configure:
+      - apiVersion: platform.kratix.io/v1alpha1
+        kind: Pipeline
+        metadata:
+          name: instance-configure
+          namespace: default
+        spec:
+          containers:
+          - image: ghcr.io/syntasso/promise-elasticcloud/elasticcloud-configure-pipeline:v0.1.0
+            name: elasticcloud-configure-pipeline
 status: {}
