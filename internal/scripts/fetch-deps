@@ -7,8 +7,8 @@ urls=(
     "https://download.elastic.co/downloads/eck/2.5.0/operator.yaml"
 )
 
-mkdir -p ${PWD}/resources
+mkdir -p ${PWD}/configure-pipeline/dependencies
 
 for url in "${urls[@]}"; do
-    curl -sL -o $PWD/resources/$(basename $url) $url
+    curl -sL -o $PWD/configure-pipeline/dependencies/$(basename $url) $url
 done
